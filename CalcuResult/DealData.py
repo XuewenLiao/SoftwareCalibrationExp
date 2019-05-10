@@ -25,7 +25,7 @@ class DealData:
         dataMatrix = np.zeros((32, 32))
 
         # 取表格中某一列的值
-        dataValue = sheet.col_values(1)
+        dataValue = sheet.col_values(2)
 
         matrixRow = 0
         matrixCol = 0
@@ -57,7 +57,7 @@ class DealData:
 
         # 将所有点的不同距离的误差值分别取出来放在对应数组里，供后面分别求平均误差值
         for row in range(7, 26): #边界：row--7, 26  col-5, 27
-            for col in range(5, 23):  # （26-7）* （24-5）= 361 个点
+            for col in range(5, 23):  # （26-7）* （23-5）= 342 个点
                 deviationOfdisArry = gaussCalcuX(dataMatrix, row, col, 4)
                 gaussDis1.append(deviationOfdisArry[0])
                 gaussDis2.append(deviationOfdisArry[1])
