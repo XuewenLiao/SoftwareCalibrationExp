@@ -25,7 +25,7 @@ class DealData:
         dataMatrix = np.zeros((32, 32))
 
         # 取表格中某一列的值
-        dataValue = sheet.col_values(2)
+        dataValue = sheet.col_values(0)
 
         matrixRow = 0
         matrixCol = 0
@@ -55,6 +55,11 @@ class DealData:
         randDis3 = []
         randDis4 = []
 
+        nearDis1 = []
+        nearDis2 = []
+        nearDis3 = []
+        nearDis4 = []
+
         # 将所有点的不同距离的误差值分别取出来放在对应数组里，供后面分别求平均误差值
         for row in range(7, 26): #边界：row--7, 26  col-5, 27
             for col in range(5, 23):  # （26-7）* （23-5）= 342 个点
@@ -76,6 +81,12 @@ class DealData:
                 randDis3.append(randDeviationOfdisArry[2])
                 randDis4.append(randDeviationOfdisArry[3])
 
+                nearDeviationOfdisArry = nearestCalcuX(dataMatrix, row, col, 4)
+                nearDis1.append(nearDeviationOfdisArry[0])
+                nearDis2.append(nearDeviationOfdisArry[1])
+                nearDis3.append(nearDeviationOfdisArry[2])
+                nearDis4.append(nearDeviationOfdisArry[3])
+
 
         writebook = xlwt.Workbook()  # 打开一个excel
         sheet = writebook.add_sheet('ResultSheet')  # 在打开的excel中添加一个sheet
@@ -94,6 +105,11 @@ class DealData:
         sheet.write(1, 2, np.mean(randDis2))
         sheet.write(2, 2, np.mean(randDis3))
         sheet.write(3, 2, np.mean(randDis4))
+
+        sheet.write(0, 3, np.mean(nearDis1))  # 写入excel
+        sheet.write(1, 3, np.mean(nearDis2))
+        sheet.write(2, 3, np.mean(nearDis3))
+        sheet.write(3, 3, np.mean(nearDis4))
 
         writebook.save('SoftwareCalibrationData.xls')  # 一定要记得保存
 
@@ -281,6 +297,63 @@ def randCalcuX(datamatrix, row, col, groupNum):
 
         # 算Xestimate
         xEstimate = random.sample(sData,1)
+        xTruth = datamatrix[row][col]
+        print("xEstimate--%r" % xEstimate)
+        print("xTruth--%r" % xTruth)
+
+        # 算误差
+        deviation = abs(xTruth - xEstimate)
+        print("deviation--%r" % deviation)
+
+        result.append(deviation)
+
+        i = i + 1
+
+    print("result--%r" % result)
+    return result
+
+"""
+   功能：离源点最近值作为估计值，与真实值误差
+   参数：源点坐标（row，col），groupNum--组数（由近到远取groupNum组值）
+"""
+def nearestCalcuX(datamatrix, row, col, groupNum):
+    # # sData = [datamatrix[8][10], datamatrix[9][11], datamatrix[10][12], datamatrix[11][13], datamatrix[12][14],
+    # #          datamatrix[7][9], datamatrix[6][8], datamatrix[5][7], datamatrix[4][6]]
+    # # sData = [datamatrix[7][11], datamatrix[8][12], datamatrix[9][13], datamatrix[10][14], datamatrix[11][15],
+    # #          datamatrix[6][10], datamatrix[5][9], datamatrix[4][8], datamatrix[3][7]]
+
+    result = []
+    # groupNum = 5
+    i = 1
+    while i <= groupNum:
+
+        s0Row = row - i
+        s0Col = col + i
+        s0 = datamatrix[s0Row][s0Col]
+        print("s0--%r" % s0)
+        #
+        # numL = 1
+        # sDataL = []
+        # sDataL.append(s0)
+        # while numL <= 4:
+        #     sDataL.append(datamatrix[s0Row + numL][s0Col + numL])
+        #     numL = numL + 1
+        #
+        # print("sDataL--%r" % sDataL)
+        #
+        # numR = 1
+        # sDataR = []
+        # while numR <= 4:
+        #     sDataR.append(datamatrix[s0Row - numR][s0Col - numR])
+        #     numR = numR + 1
+        #
+        # print("sDataR--%r" % sDataR)
+        #
+        # sData = sDataL + sDataR
+        # print("sDataR--%r" % sData)
+
+        # 算Xestimate
+        xEstimate = s0
         xTruth = datamatrix[row][col]
         print("xEstimate--%r" % xEstimate)
         print("xTruth--%r" % xTruth)
